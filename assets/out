@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -22,7 +22,7 @@ cat > "$payload" <&0
 host=$(jq -r '.source.host // ""' < "$payload")
 user_id=$(jq -r '.source.user_id // ""' < "$payload")
 light_id=$(jq -r '.source.light_id // ""' < "$payload")
-hue=$(jq -r '.source.hue // ""' < "$payload")
+hue=$(jq -r '.params.hue // ""' < "$payload")
 
 if [ -z "$user_id" ]; then
   config_errors="${config_errors}invalid payload (missing user_id)
@@ -57,4 +57,4 @@ url="$host/api/$user_id/lights/$light_id/state"
 
 curl -X PUT -d "$body" "$url"
 
-echo "not-a-real-version" >&3
+echo "null" >&3
