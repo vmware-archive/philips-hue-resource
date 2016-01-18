@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -e
+
+exec 3>&1 # make stdout available as fd 3 for the result
+exec 1>&2 # redirect all output to stderr for logging
+
+# for jq
+PATH=/usr/local/bin:$PATH
+
+
+###########
+#
+# begin processing inputs
+#
+###########
+
+payload=$TMPDIR/git-resource-request
+
+cat > "$payload" <&0
+
+host=$(jq -r '.source.host // ""' < "$payload")
+user_id=$(jq -r '.source.user_id // ""' < "$payload")
+light_id=$(jq -r '.source.light_id // ""' < "$payload")
+hue=$(jq -r '.source.hue // ""' < "$payload")
+
+if [ -z "$user_id" ]; then
+  config_errors="${config_errors}invalid payload (missing user_id)
+"
+fi
+
+if [ -z "$light_id" ]; then
+  config_errors="${config_errors}invalid payload (missing light_id)
+"
+fi
+
+if [ -z "$hue" ]; then
+  config_errors="${config_errors}invalid payload (missing hue)
+"
+fi
+
+if [ -n "$config_errors" ]; then
+  echo "$config_errors"
+  exit 1
+fi
+
+###########
+#
+# end processing inputs
+#
+###########
+
+
+body=$(jq -n "{ on: true, sat: 254, bri: 254, hue: $hue}")
+
+url="$host/api/$user_id/lights/$light_id/state"
+
+curl -X PUT -d "$body" "$url"
+
+echo "not-a-real-version" >&3
