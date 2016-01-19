@@ -9,7 +9,7 @@ resources:
     hue: 50000
     bri: 254
     sat: 254
-    alert: lselect
+    alert: none
 
 - name: phillips-hue-resource
   type: git
@@ -50,7 +50,7 @@ jobs:
       hue: 18000
       sat: 254
       bri: 200
-      alert: lselect
+      alert: select
 - name: all_over_the_place
   plan:
   - get: phillips-hue-resource
