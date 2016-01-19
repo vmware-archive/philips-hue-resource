@@ -7,9 +7,9 @@ resources:
     user_id: {{USER_ID}}
     light_id: {{LIGHT_ID}}
     hue: 50000
-    bri: 150
-    sat: 50
-    alert: select
+    bri: 254
+    sat: 254
+    alert: lselect
 
 - name: phillips-hue-resource
   type: git
@@ -38,3 +38,26 @@ jobs:
     tags: [vsphere-toronto]
     params:
       config_file_path: phillips-hue-resource/examples/testconfig
+- name: source_only
+  plan:
+  - put: light
+    tags: [vsphere-toronto]
+- name: params_only
+  plan:
+  - put: light
+    tags: [vsphere-toronto]
+    params:
+      hue: 18000
+      sat: 254
+      bri: 200
+      alert: lselect
+- name: config_file
+  plan:
+  - get: phillips-hue-resource
+  - put: light
+    tags: [vsphere-toronto]
+    params:
+      config_file_path: phillips-hue-resource/examples/partialconfig
+      sat: 254
+      bri: 130
+
