@@ -1,0 +1,32 @@
+
+resources:
+- name: light
+  type: phillips-hue
+  source:
+    host: {{HOST_URL}}
+    user_id: {{USER_ID}}
+    light_id: {{LIGHT_ID}}
+    hue: 50000
+    bri: 150
+    sat: 50
+    alert: select
+
+jobs:
+- name: green
+  plan:
+  - put: light
+    tags: [vsphere-toronto]
+    params:
+      hue: 25000
+- name: red
+  plan:
+  - put: light
+    tags: [vsphere-toronto]
+    params:
+      hue: 0
+- name: config_file
+  plan:
+  - put: light
+    tags: [vsphere-toronto]
+    params:
+      config_file_path: examples/testconfig

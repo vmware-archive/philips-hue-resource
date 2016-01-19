@@ -51,9 +51,9 @@ config_file_path=$(jq -r '.params.config_file_path // ""' < "$payload")
 if [ -n "$config_file_path" ]; then
   light_id=$(jq -r '.config.light_id // ""' < "$config_file_path")
   hue=$(jq -r '.config.hue // ""' < "$config_file_path")
-  saturation=$(jq -r '.config.saturation // ""' < "$config_file_path")
-  brightness=$(jq -r '.config.brightness // ""' < "$config_file_path")
-  is_on=$(jq -r '.config.is_on // ""' < "$config_file_path")
+  sat=$(jq -r '.config.sat // ""' < "$config_file_path")
+  bri=$(jq -r '.config.bri // ""' < "$config_file_path")
+  on=$(jq -r '.config.on // ""' < "$config_file_path")
   alert=$(jq -r '.config.alert // ""' < "$config_file_path")
 fi
 
@@ -72,16 +72,16 @@ if [ -z "$hue" ]; then
   hue=$(jq -r '.params.hue // ""' < "$payload")
 fi
 
-if [ -z "$saturation" ]; then
-  saturation=$(jq -r '.params.saturation // ""' < "$payload")
+if [ -z "$sat" ]; then
+  sat=$(jq -r '.params.sat // ""' < "$payload")
 fi
 
-if [ -z "$brightness" ]; then
-  brightness=$(jq -r '.params.brightness // ""' < "$payload")
+if [ -z "$bri" ]; then
+  bri=$(jq -r '.params.bri // ""' < "$payload")
 fi
 
-if [ -z "$is_on" ]; then
-  is_on=$(jq -r '.params.is_on // ""' < "$payload")
+if [ -z "$on" ]; then
+  on=$(jq -r '.params.on // ""' < "$payload")
 fi
 
 if [ -z "$alert" ]; then
@@ -103,16 +103,16 @@ if [ -z "$hue" ]; then
   hue=$(jq -r '.source.hue // ""' < "$payload")
 fi
 
-if [ -z "$saturation" ]; then
-  saturation=$(jq -r '.source.saturation // ""' < "$payload")
+if [ -z "$sat" ]; then
+  sat=$(jq -r '.source.sat // ""' < "$payload")
 fi
 
-if [ -z "$brightness" ]; then
-  brightness=$(jq -r '.source.brightness // ""' < "$payload")
+if [ -z "$bri" ]; then
+  bri=$(jq -r '.source.bri // ""' < "$payload")
 fi
 
-if [ -z "$is_on" ]; then
-  is_on=$(jq -r '.source.is_on // ""' < "$payload")
+if [ -z "$on" ]; then
+  on=$(jq -r '.source.on // ""' < "$payload")
 fi
 
 if [ -z "$alert" ]; then
@@ -125,16 +125,16 @@ fi
   #
   ###########
 
-if [ -z "$saturation" ]; then
-  saturation=254
+if [ -z "$sat" ]; then
+  sat=254
 fi
 
-if [ -z "$brightness" ]; then
-  brightness=254
+if [ -z "$bri" ]; then
+  bri=254
 fi
 
-if [ -z "$is_on" ]; then
-  is_on=true
+if [ -z "$on" ]; then
+  on=true
 fi
 
 if [ -z "$alert" ]; then
@@ -175,7 +175,7 @@ if [ -n "$config_errors" ]; then
   exit 1
 fi
 
-body=$(jq -n "{ on: $is_on, sat: $saturation, bri: $brightness, hue: $hue, effect: none, alert: $alert}")
+body=$(jq -n "{ on: $on, sat: $sat, bri: $bri, hue: $hue, effect: none, alert: $alert}")
 
 curl -X PUT -d "$body" "$url"
 
