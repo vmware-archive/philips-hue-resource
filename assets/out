@@ -9,6 +9,8 @@ exec 1>&2 # redirect all output to stderr for logging
 PATH=/usr/local/bin:$PATH
 
 
+cd "$1"
+
 ###########
 #
 # begin processing inputs
@@ -87,7 +89,6 @@ fi
 if [ -z "$alert" ]; then
   alert=$(jq -r '.params.alert // ""' < "$payload")
 fi
-
 
   ###########
   #
@@ -168,14 +169,14 @@ url="$host/api/$user_id/lights/$light_id/state"
 if [ -n "$config_errors" ]; then
   echo "$config_errors"
 
-  body=$(jq -n "{ on: true, bri: 254, sat: 254, effect: colorloop}")
+  body=$(jq -n "{ on: true, bri: 254, sat: 254, effect: \"colorloop\"}")
 
   curl -X PUT -d "$body" "$url"
 
   exit 1
 fi
 
-body=$(jq -n "{ on: $on, sat: $sat, bri: $bri, hue: $hue, effect: none, alert: $alert}")
+body=$(jq -n "{ on: $on, sat: $sat, bri: $bri, hue: $hue, effect: \"none\", alert: \"$alert\"}")
 
 curl -X PUT -d "$body" "$url"
 

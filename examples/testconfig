@@ -1,8 +1,11 @@
 {
-  "on": "true",
-  "hue": 25000,
-  "sat": 150,
-  "bri": 50,
-  "alert": "lselect",
-  "light_id": 2
+  "config": 
+  {
+    "on": "true",
+    "hue": 25000,
+    "sat": 150,
+    "bri": 50,
+    "alert": "lselect",
+    "light_id": 2
+  }
 }
