@@ -166,6 +166,22 @@ fi
 
 url="$host/api/$user_id/lights/$light_id/state"
 
+if [ -z "$config_errors" ]; then
+  body=$(jq -n "{ on: $on, sat: $sat, bri: $bri, hue: $hue, effect: \"none\", alert: \"$alert\"}")
+
+  curl -s -o response_file -X PUT -d "$body" "$url"
+  
+  success=$(jq -r 'map(has("success"))' < "response_file" | jq -r 'all')
+
+  if [ "$success" = true ]; then
+    echo "null" >&3
+  else
+    cat response_file
+    exit 1
+  fi
+
+fi
+
 if [ -n "$config_errors" ]; then
   echo "$config_errors"
 
@@ -176,8 +192,4 @@ if [ -n "$config_errors" ]; then
   exit 1
 fi
 
-body=$(jq -n "{ on: $on, sat: $sat, bri: $bri, hue: $hue, effect: \"none\", alert: \"$alert\"}")
 
-curl -X PUT -d "$body" "$url"
-
-echo "null" >&3

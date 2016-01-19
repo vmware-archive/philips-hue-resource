@@ -10,6 +10,12 @@ resources:
     bri: 254
     sat: 254
     alert: none
+- name: broken-light
+  type: phillips-hue
+  source:
+    host: {{HOST_URL}}
+    user_id: 1234
+    light_id: {{LIGHT_ID}}
 
 - name: phillips-hue-resource
   type: git
@@ -60,4 +66,13 @@ jobs:
       config_file_path: phillips-hue-resource/examples/partialconfig
       sat: 254
       bri: 130
-
+- name: config_error
+  plan:
+    - put: broken-light
+      tags: [vsphere-toronto]
+- name: api_error
+  plan:
+    - put: broken-light
+      tags: [vsphere-toronto]
+      params:
+        hue: 5000
