@@ -51,7 +51,7 @@ jobs:
       sat: 254
       bri: 200
       alert: lselect
-- name: config_file
+- name: all_over_the_place
   plan:
   - get: phillips-hue-resource
   - put: light
