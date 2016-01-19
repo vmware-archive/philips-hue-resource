@@ -21,13 +21,131 @@ cat > "$payload" <&0
 
 host=$(jq -r '.source.host // ""' < "$payload")
 user_id=$(jq -r '.source.user_id // ""' < "$payload")
-light_id=$(jq -r '.source.light_id // ""' < "$payload")
-hue=$(jq -r '.params.hue // ""' < "$payload")
+
+  ###########
+  #
+  # required resource definition
+  #
+  ###########
+
+
+if [ -z "$host" ]; then
+  config_errors="${config_errors}invalid payload (missing host)
+"
+fi
 
 if [ -z "$user_id" ]; then
   config_errors="${config_errors}invalid payload (missing user_id)
 "
 fi
+
+
+  ###########
+  #
+  # optional config file
+  #
+  ###########
+
+config_file_path=$(jq -r '.params.config_file_path // ""' < "$payload")
+
+if [ -n "$config_file_path" ]; then
+  light_id=$(jq -r '.config.light_id // ""' < "$config_file_path")
+  hue=$(jq -r '.config.hue // ""' < "$config_file_path")
+  saturation=$(jq -r '.config.saturation // ""' < "$config_file_path")
+  brightness=$(jq -r '.config.brightness // ""' < "$config_file_path")
+  is_on=$(jq -r '.config.is_on // ""' < "$config_file_path")
+  alert=$(jq -r '.config.alert // ""' < "$config_file_path")
+fi
+
+
+  ###########
+  #
+  # optional put params
+  #
+  ###########
+
+if [ -z "$light_id" ]; then
+  light_id=$(jq -r '.params.light_id // ""' < "$payload")
+fi
+
+if [ -z "$hue" ]; then
+  hue=$(jq -r '.params.hue // ""' < "$payload")
+fi
+
+if [ -z "$saturation" ]; then
+  saturation=$(jq -r '.params.saturation // ""' < "$payload")
+fi
+
+if [ -z "$brightness" ]; then
+  brightness=$(jq -r '.params.brightness // ""' < "$payload")
+fi
+
+if [ -z "$is_on" ]; then
+  is_on=$(jq -r '.params.is_on // ""' < "$payload")
+fi
+
+if [ -z "$alert" ]; then
+  alert=$(jq -r '.params.alert // ""' < "$payload")
+fi
+
+
+  ###########
+  #
+  # defaults from resource definition
+  #
+  ###########
+
+if [ -z "$light_id" ]; then
+  light_id=$(jq -r '.source.light_id // ""' < "$payload")
+fi
+
+if [ -z "$hue" ]; then
+  hue=$(jq -r '.source.hue // ""' < "$payload")
+fi
+
+if [ -z "$saturation" ]; then
+  saturation=$(jq -r '.source.saturation // ""' < "$payload")
+fi
+
+if [ -z "$brightness" ]; then
+  brightness=$(jq -r '.source.brightness // ""' < "$payload")
+fi
+
+if [ -z "$is_on" ]; then
+  is_on=$(jq -r '.source.is_on // ""' < "$payload")
+fi
+
+if [ -z "$alert" ]; then
+  alert=$(jq -r '.source.alert // ""' < "$payload")
+fi
+
+  ###########
+  #
+  # fallback values
+  #
+  ###########
+
+if [ -z "$saturation" ]; then
+  saturation=254
+fi
+
+if [ -z "$brightness" ]; then
+  brightness=254
+fi
+
+if [ -z "$is_on" ]; then
+  is_on=true
+fi
+
+if [ -z "$alert" ]; then
+  alert=none
+fi
+
+  ###########
+  #
+  # check for missing configurations
+  #
+  ###########
 
 if [ -z "$light_id" ]; then
   config_errors="${config_errors}invalid payload (missing light_id)
@@ -39,21 +157,25 @@ if [ -z "$hue" ]; then
 "
 fi
 
-if [ -n "$config_errors" ]; then
-  echo "$config_errors"
-  exit 1
-fi
-
 ###########
 #
 # end processing inputs
 #
 ###########
 
-
-body=$(jq -n "{ on: true, sat: 254, bri: 254, hue: $hue}")
-
 url="$host/api/$user_id/lights/$light_id/state"
+
+if [ -n "$config_errors" ]; then
+  echo "$config_errors"
+
+  body=$(jq -n "{ on: true, bri: 254, sat: 254, effect: colorloop}")
+
+  curl -X PUT -d "$body" "$url"
+
+  exit 1
+fi
+
+body=$(jq -n "{ on: $is_on, sat: $saturation, bri: $brightness, hue: $hue, effect: none, alert: $alert}")
 
 curl -X PUT -d "$body" "$url"
 
