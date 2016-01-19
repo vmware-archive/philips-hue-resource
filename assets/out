@@ -9,7 +9,7 @@ exec 1>&2 # redirect all output to stderr for logging
 PATH=/usr/local/bin:$PATH
 
 
-cd "$1"
+resource_dir="$1"
 
 ###########
 #
@@ -51,12 +51,12 @@ fi
 config_file_path=$(jq -r '.params.config_file_path // ""' < "$payload")
 
 if [ -n "$config_file_path" ]; then
-  light_id=$(jq -r '.config.light_id // ""' < "$config_file_path")
-  hue=$(jq -r '.config.hue // ""' < "$config_file_path")
-  sat=$(jq -r '.config.sat // ""' < "$config_file_path")
-  bri=$(jq -r '.config.bri // ""' < "$config_file_path")
-  on=$(jq -r '.config.on // ""' < "$config_file_path")
-  alert=$(jq -r '.config.alert // ""' < "$config_file_path")
+  light_id=$(jq -r '.config.light_id // ""' < "$resource_dir"/"$config_file_path")
+  hue=$(jq -r '.config.hue // ""' < "$resource_dir"/"$config_file_path")
+  sat=$(jq -r '.config.sat // ""' < "$resource_dir"/"$config_file_path")
+  bri=$(jq -r '.config.bri // ""' < "$resource_dir"/"$config_file_path")
+  on=$(jq -r '.config.on // ""' < "$resource_dir"/"$config_file_path")
+  alert=$(jq -r '.config.alert // ""' < "$resource_dir"/"$config_file_path")
 fi
 
 
