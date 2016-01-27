@@ -1,1 +1,1 @@
-# phillips-hue-resource
+# philips-hue-resource
